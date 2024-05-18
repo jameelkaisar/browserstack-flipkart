@@ -1,0 +1,30 @@
+name: 'BrowserStack Test'
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  ubuntu-job:
+    name: 'BrowserStack Test on Ubuntu'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'BrowserStack Env Setup'
+        uses: 'browserstack/github-actions/setup-env@master'
+        with:
+          username:  ${{ secrets.BROWSERSTACK_USERNAME }}
+          access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          build-name: 'flipkart-test-0'
+          project-name: 'Flipkart Test'
+      - name: 'BrowserStackLocal Setup'
+        uses: 'browserstack/github-actions/setup-local@master'
+        with:
+          local-testing: start
+          local-identifier: random
+      - name: 'Checkout Code'
+        uses: actions/checkout@v3
+      - name: 'Python Install Requirements'
+        run: pip3 install -r requirements.txt
+      - name: 'Python Start BrowserStack Test'
+        run: browserstack-sdk ./tests/flipkart.py
+      - name: 'BrowserStackLocal Stop'
+        uses: 'browserstack/github-actions/setup-local@master'
+        with:
+          local-testing: stop
